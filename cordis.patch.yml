@@ -1,0 +1,8 @@
+- insert:
+    - id: file-explorer
+      name: dsh-file-explorer
+      config:
+        extraRoots: []
+        maxTextBytes: 2097152
+        maxImageBytes: 20971520
+        maxDirectoryEntries: 2000

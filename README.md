@@ -2,6 +2,10 @@
 
 DeepSeek Harness 的第三方只读文件查看插件。点击聊天中的文件，在 `shell.overlay` 右侧抽屉内浏览，无需修改 DSH 源码。
 
+[下载安装包与演示](https://github.com/zsspub/dsh-file-explorer/releases/tag/v0.1.0) · [验证报告](docs/verification.md)
+
+![文件抽屉演示](https://github.com/zsspub/dsh-file-explorer/releases/download/v0.1.0/file-explorer-demo.gif)
+
 ## 功能
 
 - 会话标题“文件”入口，目录树、根目录切换、当前已加载目录文件名筛选和刷新。

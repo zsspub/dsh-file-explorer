@@ -30,3 +30,33 @@ it('pins sessions, ignores stale reads and aborts on close', async () => {
   expect(pending[3]!.init.signal?.aborted).toBe(true)
   expect(controller.store.getSnapshot().opened).toBe(false)
 })
+it('selects the canonical extra root when the opener passes a path alias', async () => {
+  const controller = new Controller(async (url) =>
+    Response.json(
+      url.searchParams.get('op') === 'roots'
+        ? {
+            roots: [
+              { path: '/work', name: 'work' },
+              { path: '/private/tmp/extra', name: 'extra' },
+            ],
+          }
+        : url.searchParams.get('op') === 'list'
+          ? { entries: [], truncated: false }
+          : {
+              kind: 'text',
+              path: '/private/tmp/extra/a.txt',
+              name: 'a.txt',
+              size: 1,
+              content: 'a',
+            },
+    ),
+  )
+  controller.open('test', '/tmp/extra/a.txt')
+  await new Promise((resolve) => setTimeout(resolve, 0))
+  expect(controller.store.getSnapshot()).toMatchObject({
+    root: '/private/tmp/extra',
+    selected: '/private/tmp/extra/a.txt',
+    busy: false,
+  })
+  controller.close()
+})

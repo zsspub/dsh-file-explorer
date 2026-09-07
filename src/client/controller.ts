@@ -130,6 +130,14 @@ export class Controller {
         path,
       )
       if (revision !== this.revision) return
+      const root =
+        this.value.roots.find(
+          (entry) => result.path === entry.path || result.path.startsWith(entry.path + '/'),
+        )?.path ?? this.value.root
+      const changedRoot = root !== this.value.root
+      this.set({ selected: result.path, root })
+      if (changedRoot && root) await this.expand(root, true)
+      if (revision !== this.revision) return
       if (result.kind === 'directory') {
         this.set({ busy: false })
         await this.expand(result.path, true)

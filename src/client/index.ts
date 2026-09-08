@@ -7,6 +7,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-layout/client'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type {} from '@deepseek-ai/dsh-client-locale/client'
 import { createElement } from 'react'
+import { FolderOpen } from 'lucide-react'
 import { Button } from '@deepseek-ai/dsh-client-ui-primitives'
 import { Controller } from './controller.js'
 import { installOpenAdapter } from './adapter.js'
@@ -16,7 +17,14 @@ export const inject = ['slots', 'locale', 'sessions', 'connection', 'remote']
 function Entry({ open, t }: { open: () => void; t: Translate }) {
   return createElement(
     Button,
-    { size: 'sm', variant: 'ghost', onClick: open, 'aria-haspopup': 'dialog' },
+    {
+      size: 'sm',
+      variant: 'ghost',
+      onClick: open,
+      'aria-haspopup': 'dialog',
+      style: { display: 'inline-flex', alignItems: 'center', gap: 6 },
+    },
+    createElement(FolderOpen, { size: 16, 'aria-hidden': true }),
     t('title'),
   )
 }

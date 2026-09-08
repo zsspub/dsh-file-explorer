@@ -1,5 +1,20 @@
 /** Overlay drawer with keyboard focus containment and a pointer-blocking backdrop. */
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import {
+  Check,
+  ChevronDown,
+  ChevronRight,
+  CodeXml,
+  Copy,
+  ExternalLink,
+  Eye,
+  File,
+  Folder,
+  FolderOpen,
+  PanelLeft,
+  RefreshCw,
+  X,
+} from 'lucide-react'
 import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import hljs from 'highlight.js/lib/common'
@@ -9,7 +24,7 @@ import type { Translate } from './locales.js'
 const css = `
 .dfe-backdrop{position:fixed;inset:0;background:#0005;pointer-events:auto;display:flex;justify-content:flex-end;z-index:1000}
 .dfe-drawer{width:min(70vw,1120px);height:100%;background:var(--dsw-alias-bg-layer-1,#18191c);color:var(--dsw-alias-label-primary,#eee);box-shadow:-8px 0 30px #0003;display:flex;flex-direction:column;font:14px/1.5 system-ui}
-.dfe-drawer *{box-sizing:border-box}.dfe-head{display:flex;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid var(--dsw-alias-border-default,#ffffff20)}.dfe-head strong{flex:1;font-size:16px}.dfe-body{display:flex;flex:1;min-height:0}.dfe-tree{width:230px;flex-shrink:0;border-right:1px solid var(--dsw-alias-border-default,#ffffff20);overflow:auto;padding:12px}.dfe-tree input,.dfe-tree select{width:100%;margin-bottom:10px;padding:7px;background:var(--dsw-alias-bg-layer-2,#28292d);color:inherit;border:1px solid var(--dsw-alias-border-default,#8885);border-radius:6px}.dfe-tree ul{list-style:none;margin:0;padding-left:12px}.dfe-tree>ul{padding-left:0}.dfe-item{border:0;background:none;color:inherit;text-align:left;width:100%;padding:5px 3px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dfe-item:hover,.dfe-item[aria-current=true]{background:var(--dsw-alias-bg-layer-2,#ffffff12);border-radius:4px}.dfe-main{flex:1;min-width:0;display:flex;flex-direction:column}.dfe-path{padding:10px 16px;border-bottom:1px solid var(--dsw-alias-border-default,#ffffff20);overflow-wrap:anywhere;font-size:12px;opacity:.8}.dfe-crumb{background:none;border:0;color:inherit;padding:0;cursor:pointer;text-decoration:underline}.dfe-content{overflow:auto;padding:18px;flex:1}.dfe-content pre{font:13px/1.7 ui-monospace,monospace;tab-size:2;margin:0}.dfe-line{display:block;min-height:1.7em;white-space:pre}.dfe-line:before{content:attr(data-line);display:inline-block;width:42px;text-align:right;margin-right:18px;opacity:.35;user-select:none}.dfe-content img{max-width:100%;height:auto}.dfe-content table{border-collapse:collapse}.dfe-content td,.dfe-content th{border:1px solid #8885;padding:6px}.dfe-status{padding:18px;opacity:.75}.dfe-error{padding:12px;color:var(--text-danger,#ff8e8e);overflow-wrap:anywhere}.dfe-toolbar{display:flex;gap:8px;padding:8px 16px;align-items:center}.dfe-drawer :focus-visible{outline:2px solid var(--accent,#7eaaff);outline-offset:2px}.hljs-keyword,.hljs-selector-tag{color:#bf94e4}.hljs-string,.hljs-attr{color:#91bf8e}.hljs-number,.hljs-literal{color:#dfad79}.hljs-comment{color:#8c939f}.hljs-title,.hljs-built_in{color:#80b9dc}@media(max-width:760px){.dfe-drawer{width:100vw}.dfe-tree{width:190px}}`
+.dfe-drawer *{box-sizing:border-box}.dfe-head{display:flex;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid var(--dsw-alias-border-default,#ffffff20)}.dfe-head strong{flex:1;font-size:16px}.dfe-body{display:flex;flex:1;min-height:0}.dfe-tree{width:230px;flex-shrink:0;border-right:1px solid var(--dsw-alias-border-default,#ffffff20);overflow:auto;padding:12px}.dfe-tree input,.dfe-tree select{width:100%;margin-bottom:10px;padding:7px;background:var(--dsw-alias-bg-layer-2,#28292d);color:inherit;border:1px solid var(--dsw-alias-border-default,#8885);border-radius:6px}.dfe-tree ul{list-style:none;margin:0;padding-left:12px}.dfe-tree>ul{padding-left:0}.dfe-item{display:flex;align-items:center;gap:6px;border:0;background:none;color:inherit;text-align:left;width:100%;padding:5px 3px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dfe-item svg{flex-shrink:0}.dfe-item-name{overflow:hidden;text-overflow:ellipsis}.dfe-head button,.dfe-toolbar button{display:inline-flex;align-items:center;gap:6px}.dfe-item:hover,.dfe-item[aria-current=true]{background:var(--dsw-alias-bg-layer-2,#ffffff12);border-radius:4px}.dfe-main{flex:1;min-width:0;display:flex;flex-direction:column}.dfe-path{padding:10px 16px;border-bottom:1px solid var(--dsw-alias-border-default,#ffffff20);overflow-wrap:anywhere;font-size:12px;opacity:.8}.dfe-crumb{background:none;border:0;color:inherit;padding:0;cursor:pointer;text-decoration:underline}.dfe-content{overflow:auto;padding:18px;flex:1}.dfe-content pre{font:13px/1.7 ui-monospace,monospace;tab-size:2;margin:0}.dfe-line{display:block;min-height:1.7em;white-space:pre}.dfe-line:before{content:attr(data-line);display:inline-block;width:42px;text-align:right;margin-right:18px;opacity:.35;user-select:none}.dfe-content img{max-width:100%;height:auto}.dfe-content table{border-collapse:collapse}.dfe-content td,.dfe-content th{border:1px solid #8885;padding:6px}.dfe-status{padding:18px;opacity:.75}.dfe-error{padding:12px;color:var(--text-danger,#ff8e8e);overflow-wrap:anywhere}.dfe-toolbar{display:flex;gap:8px;padding:8px 16px;align-items:center}.dfe-drawer :focus-visible{outline:2px solid var(--accent,#7eaaff);outline-offset:2px}.hljs-keyword,.hljs-selector-tag{color:#bf94e4}.hljs-string,.hljs-attr{color:#91bf8e}.hljs-number,.hljs-literal{color:#dfad79}.hljs-comment{color:#8c939f}.hljs-title,.hljs-built_in{color:#80b9dc}@media(max-width:760px){.dfe-drawer{width:100vw}.dfe-tree{width:190px}}`
 function Tree({
   path,
   state,
@@ -41,8 +56,23 @@ function Tree({
                 void (e.directory ? controller.expand(e.path) : controller.select(e.path))
               }}
             >
-              {e.directory ? (state.expanded.includes(e.path) ? '▾ ' : '▸ ') : '· '}
-              {e.name}
+              {e.directory ? (
+                <>
+                  {state.expanded.includes(e.path) ? (
+                    <ChevronDown size={14} aria-hidden="true" />
+                  ) : (
+                    <ChevronRight size={14} aria-hidden="true" />
+                  )}
+                  {state.expanded.includes(e.path) ? (
+                    <FolderOpen size={16} aria-hidden="true" />
+                  ) : (
+                    <Folder size={16} aria-hidden="true" />
+                  )}
+                </>
+              ) : (
+                <File size={16} aria-hidden="true" style={{ marginLeft: 20 }} />
+              )}
+              <span className="dfe-item-name">{e.name}</span>
             </button>
             {e.directory && state.expanded.includes(e.path) && (
               <Tree {...{ state, controller, filter, t }} path={e.path} />
@@ -170,13 +200,15 @@ export function Drawer({ controller, t }: { controller: Controller; t: Translate
         <header className="dfe-head">
           <strong>{t('title')}</strong>
           <Button variant="ghost" onClick={() => setTree(!tree)}>
+            <PanelLeft size={16} aria-hidden="true" />
             {t('tree')}
           </Button>
           <Button variant="ghost" onClick={() => controller.refresh()}>
+            <RefreshCw size={16} aria-hidden="true" />
             {t('refresh')}
           </Button>
           <Button variant="ghost" aria-label={t('close')} onClick={() => controller.close()}>
-            ✕
+            <X size={18} aria-hidden="true" />
           </Button>
         </header>
         {controller.compatibilityError && (
@@ -259,6 +291,11 @@ export function Drawer({ controller, t }: { controller: Controller; t: Translate
                 <div className="dfe-toolbar">
                   {file.kind === 'markdown' && (
                     <Button variant="ghost" onClick={() => setSource(!source)}>
+                      {source ? (
+                        <Eye size={16} aria-hidden="true" />
+                      ) : (
+                        <CodeXml size={16} aria-hidden="true" />
+                      )}
                       {source ? t('preview') : t('source')}
                     </Button>
                   )}
@@ -272,6 +309,11 @@ export function Drawer({ controller, t }: { controller: Controller; t: Translate
                         )
                       }}
                     >
+                      {copied ? (
+                        <Check size={16} aria-hidden="true" />
+                      ) : (
+                        <Copy size={16} aria-hidden="true" />
+                      )}
                       {copied ? t('copied') : t('copy')}
                     </Button>
                   )}
@@ -292,6 +334,7 @@ export function Drawer({ controller, t }: { controller: Controller; t: Translate
                         void controller.openNative()
                       }}
                     >
+                      <ExternalLink size={16} aria-hidden="true" />
                       {t('native')}
                     </Button>
                   )}

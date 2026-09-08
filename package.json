@@ -49,6 +49,7 @@
   "dependencies": {
     "@deepseek-ai/schemastery": "^3.18.2",
     "highlight.js": "^11.11.1",
+    "lucide-react": "^1.41.0",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1"
   },

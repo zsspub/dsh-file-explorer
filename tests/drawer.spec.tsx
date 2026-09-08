@@ -62,3 +62,41 @@ it('renders Markdown without loading remote images or raw HTML', async () => {
   expect(view.container.querySelector('script')).toBeNull()
   controller.close()
 })
+
+it('explains empty filters, clears them, and switches narrow screens to the selected file', async () => {
+  vi.stubGlobal('matchMedia', () => ({ matches: true }))
+  const controller = new Controller(async (url) =>
+    Response.json(
+      url.searchParams.get('op') === 'roots'
+        ? { roots: [{ path: '/demo', name: 'demo' }] }
+        : url.searchParams.get('op') === 'list'
+          ? {
+              entries: [{ path: '/demo/a.txt', name: 'a.txt', directory: false }],
+              truncated: false,
+            }
+          : { kind: 'text', path: '/demo/a.txt', name: 'a.txt', size: 5, content: 'hello' },
+    ),
+  )
+  try {
+    const view = render(<Drawer controller={controller} t={(key) => en[key]} />)
+    controller.open('test')
+    await waitFor(() => expect(view.getByRole('button', { name: 'a.txt' })).toBeTruthy())
+    fireEvent.change(view.getByRole('textbox', { name: en.filter }), {
+      target: { value: 'missing' },
+    })
+    expect(view.getByText(en.noMatches)).toBeTruthy()
+    expect(view.queryByRole('button', { name: 'a.txt' })).toBeNull()
+    fireEvent.click(view.getByRole('button', { name: en.clearFilter }))
+    expect(view.queryByText(en.noMatches)).toBeNull()
+    fireEvent.click(view.getByRole('button', { name: 'a.txt' }))
+    await waitFor(() => expect(view.container.textContent).toContain('hello'))
+    expect(view.queryByRole('navigation', { name: en.tree })).toBeNull()
+    expect(view.getByRole('button', { name: en.tree }).getAttribute('aria-expanded')).toBe('false')
+    expect(document.activeElement?.className).toBe('dfe-main')
+    fireEvent.click(view.getByRole('button', { name: en.tree }))
+    expect(view.getByRole('navigation', { name: en.tree })).toBeTruthy()
+    controller.close()
+  } finally {
+    vi.unstubAllGlobals()
+  }
+})

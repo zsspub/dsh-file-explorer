@@ -1,5 +1,5 @@
 /** Overlay drawer with keyboard focus containment and a pointer-blocking backdrop. */
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useId, useRef, useState, useSyncExternalStore } from 'react'
 import {
   Check,
   ChevronDown,
@@ -21,10 +21,18 @@ import hljs from 'highlight.js/lib/common'
 import { Button } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { Controller, State } from './controller.js'
 import type { Translate } from './locales.js'
+// Mix host syntax hues toward its foreground for readable code on the drawer surface.
 const css = `
-.dfe-backdrop{position:fixed;inset:0;background:#0005;pointer-events:auto;display:flex;justify-content:flex-end;z-index:1000}
-.dfe-drawer{width:min(70vw,1120px);height:100%;background:var(--dsw-alias-bg-layer-1,#18191c);color:var(--dsw-alias-label-primary,#eee);box-shadow:-8px 0 30px #0003;display:flex;flex-direction:column;font:14px/1.5 system-ui}
-.dfe-drawer *{box-sizing:border-box}.dfe-head{display:flex;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid var(--dsw-alias-border-default,#ffffff20)}.dfe-head strong{flex:1;font-size:16px}.dfe-body{display:flex;flex:1;min-height:0}.dfe-tree{width:230px;flex-shrink:0;border-right:1px solid var(--dsw-alias-border-default,#ffffff20);overflow:auto;padding:12px}.dfe-tree input,.dfe-tree select{width:100%;margin-bottom:10px;padding:7px;background:var(--dsw-alias-bg-layer-2,#28292d);color:inherit;border:1px solid var(--dsw-alias-border-default,#8885);border-radius:6px}.dfe-tree ul{list-style:none;margin:0;padding-left:12px}.dfe-tree>ul{padding-left:0}.dfe-item{display:flex;align-items:center;gap:6px;border:0;background:none;color:inherit;text-align:left;width:100%;padding:5px 3px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dfe-item svg{flex-shrink:0}.dfe-item-name{overflow:hidden;text-overflow:ellipsis}.dfe-head button,.dfe-toolbar button{display:inline-flex;align-items:center;gap:6px}.dfe-item:hover,.dfe-item[aria-current=true]{background:var(--dsw-alias-bg-layer-2,#ffffff12);border-radius:4px}.dfe-main{flex:1;min-width:0;display:flex;flex-direction:column}.dfe-path{padding:10px 16px;border-bottom:1px solid var(--dsw-alias-border-default,#ffffff20);overflow-wrap:anywhere;font-size:12px;opacity:.8}.dfe-crumb{background:none;border:0;color:inherit;padding:0;cursor:pointer;text-decoration:underline}.dfe-content{overflow:auto;padding:18px;flex:1}.dfe-content pre{font:13px/1.7 ui-monospace,monospace;tab-size:2;margin:0}.dfe-line{display:block;min-height:1.7em;white-space:pre}.dfe-line:before{content:attr(data-line);display:inline-block;width:42px;text-align:right;margin-right:18px;opacity:.35;user-select:none}.dfe-content img{max-width:100%;height:auto}.dfe-content table{border-collapse:collapse}.dfe-content td,.dfe-content th{border:1px solid #8885;padding:6px}.dfe-status{padding:18px;opacity:.75}.dfe-error{padding:12px;color:var(--text-danger,#ff8e8e);overflow-wrap:anywhere}.dfe-toolbar{display:flex;gap:8px;padding:8px 16px;align-items:center}.dfe-drawer :focus-visible{outline:2px solid var(--accent,#7eaaff);outline-offset:2px}.hljs-keyword,.hljs-selector-tag{color:#bf94e4}.hljs-string,.hljs-attr{color:#91bf8e}.hljs-number,.hljs-literal{color:#dfad79}.hljs-comment{color:#8c939f}.hljs-title,.hljs-built_in{color:#80b9dc}@media(max-width:760px){.dfe-drawer{width:100vw}.dfe-tree{width:190px}}`
+.dfe-backdrop{position:fixed;inset:0;background:var(--dsw-alias-bg-mask-1);backdrop-filter:var(--dsw-mask-blur);pointer-events:auto;display:flex;justify-content:flex-end;z-index:1000}
+.dfe-drawer{width:min(70vw,1120px);height:100%;background:var(--dsw-alias-bg-layer-1);color:var(--dsw-alias-label-primary);box-shadow:var(--dsw-elevation-prominent);display:flex;flex-direction:column;font:14px/22px var(--dsw-font-family)}
+.dfe-drawer *{box-sizing:border-box}.dfe-head{display:flex;align-items:center;gap:8px;padding:14px 18px;border-bottom:0.5px solid var(--dsw-alias-border-l3)}.dfe-head strong{flex:1;font-size:16px;line-height:24px;font-weight:500}.dfe-body{display:flex;flex:1;min-height:0}.dfe-tree{width:230px;flex-shrink:0;border-right:0.5px solid var(--dsw-alias-border-l3);overflow:auto;padding:12px}.dfe-tree input,.dfe-tree select{width:100%;margin-bottom:10px;height:32px;padding:0 8px;font:inherit;background:var(--dsw-alias-bg-layer-1);color:inherit;border:0.5px solid var(--dsw-alias-border-l4);border-radius:8px}.dfe-tree ul{list-style:none;margin:0;padding-left:12px}.dfe-tree>ul{padding-left:0}.dfe-item{display:flex;align-items:center;gap:6px;border:0;background:none;color:inherit;text-align:left;width:100%;min-height:28px;padding:4px;font:500 13px/20px var(--dsw-font-family);border-radius:6px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dfe-item svg{flex-shrink:0}.dfe-item-name{overflow:hidden;text-overflow:ellipsis}.dfe-head button,.dfe-toolbar button{display:inline-flex;align-items:center;gap:6px}.dfe-item:hover{background:var(--dsw-alias-interactive-bg-hover)}.dfe-item[aria-current=true]{background:var(--dsw-alias-interactive-bg-active)}.dfe-main{flex:1;min-width:0;display:flex;flex-direction:column}.dfe-path{padding:10px 16px;border-bottom:0.5px solid var(--dsw-alias-border-l3);overflow-wrap:anywhere;font-size:12px;color:var(--dsw-alias-label-secondary)}.dfe-crumb{background:none;border:0;color:inherit;padding:0;cursor:pointer;text-decoration:underline}.dfe-content{overflow:auto;padding:18px;flex:1}.dfe-content pre{font:13px/1.7 var(--ds-font-family-code);tab-size:2;margin:0}.dfe-line{display:block;min-height:1.7em;white-space:pre}.dfe-line:before{content:attr(data-line);display:inline-block;width:42px;text-align:right;margin-right:18px;color:var(--dsw-alias-label-secondary);user-select:none}.dfe-content img{max-width:100%;height:auto}.dfe-content table{border-collapse:collapse}.dfe-content td,.dfe-content th{border:0.5px solid var(--dsw-alias-border-l3);padding:6px}.dfe-status{padding:18px;color:var(--dsw-alias-label-secondary)}.dfe-error{padding:12px;color:var(--dsw-alias-state-error-primary);overflow-wrap:anywhere}.dfe-filter-hint{font-size:12px;line-height:18px;color:var(--dsw-alias-label-secondary);margin:0 0 8px}.dfe-toolbar{display:flex;flex-wrap:wrap;gap:8px;padding:8px 16px;align-items:center}.dfe-drawer :focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:2px}.dfe-drawer .hljs-keyword,.dfe-drawer .hljs-selector-tag{color:color-mix(in srgb,var(--shiki-token-keyword) 75%,var(--dsw-alias-label-primary))}.dfe-drawer .hljs-string,.dfe-drawer .hljs-attr{color:color-mix(in srgb,var(--shiki-token-string) 75%,var(--dsw-alias-label-primary))}.dfe-drawer .hljs-number,.dfe-drawer .hljs-literal{color:color-mix(in srgb,var(--shiki-token-constant) 75%,var(--dsw-alias-label-primary))}.dfe-drawer .hljs-comment{color:color-mix(in srgb,var(--shiki-token-comment) 75%,var(--dsw-alias-label-primary))}.dfe-drawer .hljs-title,.dfe-drawer .hljs-built_in{color:color-mix(in srgb,var(--shiki-token-function) 75%,var(--dsw-alias-label-primary))}@media(max-width:760px){.dfe-drawer{width:100vw}.dfe-tree{width:100%;border-right:0}.dfe-body:has(.dfe-tree) .dfe-main{display:none}.dfe-toolbar button{white-space:nowrap}.dfe-content{padding:12px}.dfe-line:before{width:28px;margin-right:12px}}`
+function hasVisibleMatch(path: string, state: State, filter: string): boolean {
+  return (state.directories[path] ?? []).some((entry) =>
+    entry.directory
+      ? state.expanded.includes(entry.path) && hasVisibleMatch(entry.path, state, filter)
+      : entry.name.toLowerCase().includes(filter.toLowerCase()),
+  )
+}
 function Tree({
   path,
   state,
@@ -121,12 +129,27 @@ function Source({ content, name }: { content: string; name: string }) {
 export function Drawer({ controller, t }: { controller: Controller; t: Translate }) {
   const state = useSyncExternalStore(controller.store.subscribe, controller.store.getSnapshot)
   const ref = useRef<HTMLElement>(null)
+  const treeId = useId()
+  const filterHintId = useId()
   const [tree, setTree] = useState(true),
     [filter, setFilter] = useState(''),
     [source, setSource] = useState(false),
     [zoom, setZoom] = useState(100),
     [copied, setCopied] = useState(false),
     [localError, setLocalError] = useState<string>()
+  useEffect(() => {
+    if (state.opened) setTree(true)
+  }, [state.opened])
+  useEffect(() => {
+    if (state.file && window.matchMedia?.('(max-width:760px)').matches) {
+      setTree(false)
+    }
+  }, [state.file])
+  useEffect(() => {
+    if (!tree && state.file && window.matchMedia?.('(max-width:760px)').matches) {
+      ref.current?.querySelector<HTMLElement>('.dfe-main')?.focus()
+    }
+  }, [tree, state.file])
   useEffect(() => {
     setSource(false)
     setZoom(100)
@@ -199,7 +222,12 @@ export function Drawer({ controller, t }: { controller: Controller; t: Translate
       >
         <header className="dfe-head">
           <strong>{t('title')}</strong>
-          <Button variant="ghost" onClick={() => setTree(!tree)}>
+          <Button
+            variant="ghost"
+            aria-expanded={tree}
+            aria-controls={treeId}
+            onClick={() => setTree(!tree)}
+          >
             <PanelLeft size={16} aria-hidden="true" />
             {t('tree')}
           </Button>
@@ -216,9 +244,17 @@ export function Drawer({ controller, t }: { controller: Controller; t: Translate
             {t('compatibility')}: {controller.compatibilityError}
           </div>
         )}
+        {(state.error || localError) && (
+          <div role="alert" className="dfe-error">
+            <div>
+              {t('failure')}: {state.error ?? localError}
+            </div>
+            <div>{t('recover')}</div>
+          </div>
+        )}
         <div className="dfe-body">
-          {tree && (
-            <nav className="dfe-tree" aria-label={t('tree')}>
+          {tree && state.roots.length > 0 && (
+            <nav id={treeId} className="dfe-tree" aria-label={t('tree')}>
               <select
                 aria-label={t('roots')}
                 value={state.root ?? ''}
@@ -233,14 +269,31 @@ export function Drawer({ controller, t }: { controller: Controller; t: Translate
               <input
                 placeholder={t('filter')}
                 aria-label={t('filter')}
+                aria-describedby={filterHintId}
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
               />
+              <p id={filterHintId} className="dfe-filter-hint">
+                {t('filterHint')}
+              </p>
+              {filter && (
+                <Button variant="ghost" size="sm" onClick={() => setFilter('')}>
+                  {t('clearFilter')}
+                </Button>
+              )}
+              {filter &&
+                state.root &&
+                !state.busy &&
+                !hasVisibleMatch(state.root, state, filter) && (
+                  <p className="dfe-filter-hint" role="status">
+                    {t('noMatches')}
+                  </p>
+                )}
               {state.root && <Tree path={state.root} {...{ state, controller, filter, t }} />}
               {state.truncated && <p>{t('truncated')}</p>}
             </nav>
           )}
-          <main className="dfe-main">
+          <main className="dfe-main" tabIndex={-1}>
             <nav className="dfe-path" aria-label={t('path')}>
               <button
                 className="dfe-crumb"
@@ -277,11 +330,7 @@ export function Drawer({ controller, t }: { controller: Controller; t: Translate
                     </span>
                   ))}
             </nav>
-            {(state.error || localError) && (
-              <div role="alert" className="dfe-error">
-                {t('failure')}: {state.error ?? localError}
-              </div>
-            )}
+
             {state.busy ? (
               <div className="dfe-status" role="status">
                 {t('loading')}
@@ -350,6 +399,8 @@ export function Drawer({ controller, t }: { controller: Controller; t: Translate
                   ) : file.kind === 'binary' || file.kind === 'large' ? (
                     <p>
                       {t(file.kind)} · {file.size} B
+                      <br />
+                      {t('previewHelp')} {controller.native && t('nativeHelp')}
                     </p>
                   ) : file.kind === 'markdown' && !source ? (
                     <Markdown

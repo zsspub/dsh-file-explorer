@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-08T13:15:30.873343+00:00",
+  "title": "Design System: DSH File Explorer",
+  "extensions": {
+    "shadows": [
+      {
+        "name": "prominent",
+        "value": "var(--dsw-elevation-prominent)",
+        "purpose": "宿主浮层"
+      }
+    ],
+    "motion": [
+      {
+        "name": "standard",
+        "value": "var(--ds-transition-duration) var(--ds-ease-in-out)",
+        "purpose": "宿主默认动效"
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "plugin-narrow",
+        "value": "760px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Button",
+      "kind": "button",
+      "description": "宿主源码样式片段；仅供已加载宿主主题的预览上下文使用。",
+      "html": "<button class=\"ds-button ds-sm ds-ghost\">刷新</button>",
+      "css": ".ds-button{\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  gap: 4px;\n  border: none;\n  border-radius: 18px;\n  cursor: pointer;\n  font-size: 14px;\n  line-height: 22px;\n  color: var(--dsw-alias-label-primary);\n  background: transparent;\n  padding: 0 14px;\n}\n.ds-button:disabled{\n  cursor: not-allowed;\n  opacity: 0.4;\n}\n.ds-md{\n  height: 36px;\n}\n.ds-sm{\n  height: 28px;\n  font-size: 12px;\n  line-height: 18px;\n  padding: 0 10px;\n  border-radius: 14px;\n}\n.ds-primary{\n  background: var(--dsw-alias-button-primary-fill);\n  color: var(--dsw-alias-label-primary-foreground);\n}\n.ds-primary:hover:not(:disabled){\n  background: var(--dsw-alias-button-primary-hover);\n}\n.ds-ghost:hover:not(:disabled){\n  background: var(--dsw-alias-interactive-bg-hover);\n}\n.ds-ghost:active:not(:disabled){\n  background: var(--dsw-alias-interactive-bg-active);\n}\n.ds-outline{\n  border: 0.5px solid var(--dsw-alias-border-l3);\n  background: transparent;\n}\n.ds-outline:hover:not(:disabled){\n  background: var(--dsw-alias-interactive-bg-hover);\n}\n.ds-toolbar{\n  background: var(--dsw-alias-button-tool-bar-fill);\n}\n.ds-toolbar:hover:not(:disabled){\n  background: var(--dsw-alias-button-tool-bar-hover);\n}\n.ds-icon{\n  display: inline-flex;\n  width: 16px;\n  height: 16px;\n  align-items: center;\n  justify-content: center;\n}"
+    },
+    {
+      "name": "Input",
+      "kind": "input",
+      "description": "宿主源码样式片段；仅供已加载宿主主题的预览上下文使用。",
+      "html": "<label class=\"ds-wrap\"><input class=\"ds-input\" placeholder=\"筛选文件\" aria-label=\"筛选文件\"></label>",
+      "css": ".ds-wrap{\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  height: 32px;\n  padding: 0 8px;\n  border: 0.5px solid var(--dsw-alias-border-l4);\n  border-radius: 8px;\n  background: var(--dsw-alias-bg-layer-1);\n}\n.ds-wrap:focus-within{\n  border-color: var(--dsw-alias-brand-primary);\n}\n.ds-icon{\n  display: inline-flex;\n  width: 16px;\n  height: 16px;\n  align-items: center;\n  justify-content: center;\n  color: var(--dsw-alias-label-tertiary);\n}\n.ds-input{\n  flex: 1;\n  min-width: 0;\n  border: none;\n  outline: none;\n  background: transparent;\n  font-size: 14px;\n  line-height: 22px;\n  color: var(--dsw-alias-label-primary);\n}\n.ds-input::placeholder{\n  color: var(--dsw-alias-label-dimmed);\n}"
+    },
+    {
+      "name": "Directory row",
+      "kind": "nav",
+      "description": "宿主源码样式片段；仅供已加载宿主主题的预览上下文使用。",
+      "html": "<button class=\"ds-row\"><span class=\"ds-rowName\">src</span></button>",
+      "css": ".ds-row{\n  width: 100%;\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  height: 28px;\n  flex: none;\n  padding: 4px;\n  border: none;\n  border-radius: 6px;\n  background: transparent;\n  text-align: left;\n  cursor: pointer;\n}\n.ds-row:hover{\n  background: var(--dsw-alias-interactive-bg-hover);\n}\n.ds-rowSelected,\n.ds-rowSelected:hover{\n  background: var(--dsw-alias-interactive-bg-active, var(--dsw-alias-interactive-bg-hover));\n}\n.ds-rowName{\n  flex: 1 1 0;\n  min-width: 0;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  font-size: 13px;\n  line-height: 20px;\n  font-weight: 500;\n  color: var(--dsw-alias-label-primary);\n}"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "description": "宿主源码样式片段；仅供已加载宿主主题的预览上下文使用。",
+      "html": "<button class=\"ds-button ds-sm ds-primary\">打开</button>",
+      "css": ".ds-button{\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  gap: 4px;\n  border: none;\n  border-radius: 18px;\n  cursor: pointer;\n  font-size: 14px;\n  line-height: 22px;\n  color: var(--dsw-alias-label-primary);\n  background: transparent;\n  padding: 0 14px;\n}\n.ds-button:disabled{\n  cursor: not-allowed;\n  opacity: 0.4;\n}\n.ds-md{\n  height: 36px;\n}\n.ds-sm{\n  height: 28px;\n  font-size: 12px;\n  line-height: 18px;\n  padding: 0 10px;\n  border-radius: 14px;\n}\n.ds-primary{\n  background: var(--dsw-alias-button-primary-fill);\n  color: var(--dsw-alias-label-primary-foreground);\n}\n.ds-primary:hover:not(:disabled){\n  background: var(--dsw-alias-button-primary-hover);\n}\n.ds-ghost:hover:not(:disabled){\n  background: var(--dsw-alias-interactive-bg-hover);\n}\n.ds-ghost:active:not(:disabled){\n  background: var(--dsw-alias-interactive-bg-active);\n}\n.ds-outline{\n  border: 0.5px solid var(--dsw-alias-border-l3);\n  background: transparent;\n}\n.ds-outline:hover:not(:disabled){\n  background: var(--dsw-alias-interactive-bg-hover);\n}\n.ds-toolbar{\n  background: var(--dsw-alias-button-tool-bar-fill);\n}\n.ds-toolbar:hover:not(:disabled){\n  background: var(--dsw-alias-button-tool-bar-hover);\n}\n.ds-icon{\n  display: inline-flex;\n  width: 16px;\n  height: 16px;\n  align-items: center;\n  justify-content: center;\n}"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "description": "宿主源码样式片段；仅供已加载宿主主题的预览上下文使用。",
+      "html": "<button class=\"ds-button ds-sm ds-outline\">取消</button>",
+      "css": ".ds-button{\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  gap: 4px;\n  border: none;\n  border-radius: 18px;\n  cursor: pointer;\n  font-size: 14px;\n  line-height: 22px;\n  color: var(--dsw-alias-label-primary);\n  background: transparent;\n  padding: 0 14px;\n}\n.ds-button:disabled{\n  cursor: not-allowed;\n  opacity: 0.4;\n}\n.ds-md{\n  height: 36px;\n}\n.ds-sm{\n  height: 28px;\n  font-size: 12px;\n  line-height: 18px;\n  padding: 0 10px;\n  border-radius: 14px;\n}\n.ds-primary{\n  background: var(--dsw-alias-button-primary-fill);\n  color: var(--dsw-alias-label-primary-foreground);\n}\n.ds-primary:hover:not(:disabled){\n  background: var(--dsw-alias-button-primary-hover);\n}\n.ds-ghost:hover:not(:disabled){\n  background: var(--dsw-alias-interactive-bg-hover);\n}\n.ds-ghost:active:not(:disabled){\n  background: var(--dsw-alias-interactive-bg-active);\n}\n.ds-outline{\n  border: 0.5px solid var(--dsw-alias-border-l3);\n  background: transparent;\n}\n.ds-outline:hover:not(:disabled){\n  background: var(--dsw-alias-interactive-bg-hover);\n}\n.ds-toolbar{\n  background: var(--dsw-alias-button-tool-bar-fill);\n}\n.ds-toolbar:hover:not(:disabled){\n  background: var(--dsw-alias-button-tool-bar-hover);\n}\n.ds-icon{\n  display: inline-flex;\n  width: 16px;\n  height: 16px;\n  align-items: center;\n  justify-content: center;\n}"
+    }
+  ],
+  "narrative": {
+    "northStar": "DSH 原生工具界面的延伸",
+    "overview": "文件抽屉服务于浏览工作区和阅读文件，采用紧凑、克制、内容优先的 DSH 设计语言。宿主设计是视觉权威；Impeccable 的通用字体、配色、圆角或装饰建议不得覆盖这套身份。",
+    "keyCharacteristics": [
+      "使用宿主语义颜色和字体，随宿主浅色、深色主题变化。",
+      "用文字层级、对齐、轻分隔线与交互状态组织高密度内容。",
+      "优先使用 DSH primitives；Lucide 图标沿用当前插件约定。"
+    ],
+    "rules": [],
+    "dos": [
+      "Do 优先服从宿主设计与已确认的用户要求。",
+      "Do 使用宿主变量、原生控件和可追踪的来源值。",
+      "Do 在真实 DSH 中核对浅色、深色、窄屏、键盘及真实文件内容。"
+    ],
+    "donts": [
+      "Don't 为符合通用审美建议换字体、发明品牌色或加入装饰性渐变。",
+      "Don't 将单个组件的尺寸误称为整个宿主的统一标准。",
+      "Don't 将源码扫描或文档 lint 通过描述为视觉/E2E 验证通过。"
+    ]
+  }
+}

@@ -64,6 +64,10 @@ dsh plugin --profile web remove dsh-file-explorer
 
 同时移除 profile 中针对 `file-explorer` 的自定义配置覆盖。刷新客户端后，DSH 恢复原生打开方式。
 
+## 设计规范
+
+界面风格固定遵循 [DSH 设计规范](DESIGN.md)。开发前读取 [项目约定](AGENTS.md)，Impeccable 的安装方法和使用顺序见 [设计工作流](docs/design-workflow.md)。
+
 ## 开发与检查
 
 ```sh
